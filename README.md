@@ -1,42 +1,46 @@
-=======    Nitro Hax    =======
-=======    By Chishm    =======
+Nitro Hax
+=========
+
+By Chishm
 
 Nitro Hax is a cheat tool for the Nintendo DS. 
 It works with original games only.
 
 
-============ Usage ============
+Usage
+=====
 
-1) Patch NitroHax.nds with a DLDI file if you need to.
-2) Copy the NitroHax.nds file to your media device.
-3) Place an Action Replay XML file on your media device.
-4) Start NitroHax.nds from your media device
- 4a) One of the following will be loaded automatically if it is found (in order of preference):
-       "cheats.xml" in the current directory
-       "/NitroHax/cheats.xml"
-       "/data/NitroHax/cheats.xml"
-       "/cheats.xml"
- 4b) If no file is found, browse for and select a file to open.
-5) Remove your media device if you want to.
-6) Remove any card that is in Slot-1
-7) Insert the DS game into Slot-1
-8) Choose the cheats you want to enable.
- 8a) Some cheats are enabled by default and others may be always on. This is specified in the XML file.
- 8b) The keys are:
-        A : Open a folder or toggle a cheat enabled
-        B : Go up a folder or exit the cheat menu if at the top level
-        X : Enable all cheats in current folder
-        Y : Disable all cheats in current folder
-        L : Move up half a screen
-        R : Move down half a screen
-       Up : Move up one line
-     Down : Move down one line
-    Start : Start the game
-9) When you are done, exit the cheat menu.
-10) The game will then start with cheats running.
+1. Patch NitroHax.nds with a DLDI file if you need to.
+2. Copy the NitroHax.nds file to your media device.
+3. Place an Action Replay XML file on your media device.
+4. Start NitroHax.nds from your media device
+  1. One of the following will be loaded automatically if it is found (in order of preference):
+    * "cheats.xml" in the current directory
+    * "/NitroHax/cheats.xml"
+    * "/data/NitroHax/cheats.xml"
+    * "/cheats.xml"
+  2. If no file is found, browse for and select a file to open.
+5. Remove your media device if you want to.
+6. Remove any card that is in Slot-1
+7. Insert the DS game into Slot-1
+8. Choose the cheats you want to enable.
+  1. Some cheats are enabled by default and others may be always on. This is specified in the XML file.
+  2. The keys are:
+    * **A**: Open a folder or toggle a cheat enabled
+    * **B**: Go up a folder or exit the cheat menu if at the top level
+    * **X**: Enable all cheats in current folder
+    * **Y**: Disable all cheats in current folder
+    * **L**: Move up half a screen
+    * **R**: Move down half a screen
+    * **Up**: Move up one line
+    * **Down**: Move down one line
+    * **Start**: Start the game
+9. When you are done, exit the cheat menu.
+10. The game will then start with cheats running.
 
 
-========== Copyright ==========
+Copyright
+=========
 
 Copyright (C) 2008  Michael "Chishm" Chisholm
 
@@ -54,10 +58,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-====== Acknowledgements =======
+Acknowledgements
+================
 
-Thanks to:
-(in no particular order)
+Thanks to (in no particular order):
 * Pink-Lightning - Original skin (v0.5-0.82)
 * bLAStY - Memory dumps
 * cReDiAr - Last crucial step for running DS Cards
@@ -71,8 +75,10 @@ Thanks to:
 Big thanks to Datel (CodeJunkies) for creating the original Action Replay and its cheats
 
 
-====== Custom Code Types ======
+Custom Code Types
+=================
 
+```
 CF000000 00000000 - End of code list
 CF000001 xxxxxxxx - Relocate cheat engine to xxxxxxxx 
 CF000002 xxxxxxxx - Change hook address to xxxxxxxx
@@ -125,4 +131,4 @@ D400000x yyyyyyyy - Dx Data operation
 If type codes
 	Adds offset to the address if the lowest bit of the address is set. 
 	Sets the address equal to offset if the original address is 0x00000000.
-
+```
