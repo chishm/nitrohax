@@ -18,7 +18,7 @@
 
 #include <nds.h>
 #include <nds/arm7/input.h>
-#include <nds/arm7/system.h>
+#include <nds/system.h>
 
 #include "cheat_engine_arm7.h"
 
@@ -46,11 +46,11 @@ int main(void) {
 	SetYtrigger(80);
 
 	installSystemFIFO();
-	
+
 	irqSet(IRQ_VCOUNT, VcountHandler);
 	irqSet(IRQ_VBLANK, VblankHandler);
 
-	irqEnable( IRQ_VBLANK | IRQ_VCOUNT);   
+	irqEnable( IRQ_VBLANK | IRQ_VCOUNT);
 
 	// Keep the ARM7 mostly idle
 	while (1) {

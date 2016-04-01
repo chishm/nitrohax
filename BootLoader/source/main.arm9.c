@@ -1,9 +1,9 @@
 /*
  main.arm9.c
- 
+
  By Michael Chisholm (Chishm)
- 
- All resetMemory and startBinary functions are based 
+
+ All resetMemory and startBinary functions are based
  on the MultiNDS loader by Darkain.
  Original source available at:
  http://cvs.sourceforge.net/viewcvs.py/ndslib/ndslib/examples/loader/boot/main.cpp
@@ -57,20 +57,20 @@ Written by Chishm
 static void arm9_errorOutput (u32 code, bool clearBG) {
 	int i, j, k;
 	u16 colour;
-	
-	REG_POWERCNT = POWER_LCD | POWER_2D_A;
+
+	REG_POWERCNT = (u16)(POWER_LCD | POWER_2D_A);
 	REG_DISPCNT = MODE_FB0;
 	VRAM_A_CR = VRAM_ENABLE;
-	
+
 	if (clearBG) {
 		// Clear display
 		for (i = 0; i < 256*192; i++) {
 			VRAM_A[i] = 0x0000;
 		}
 	}
-	
+
 	// Draw boxes of colour, signifying error codes
-	
+
 	if ((code >> 16) != 0) {
 		// high 16 bits
 		for (i = 0; i < 8; i++) {						// Pair of bits to use
@@ -127,7 +127,7 @@ static void arm9_errorOutput (u32 code, bool clearBG) {
 				}
 			}
 		}
-	}		
+	}
 }
 
 /*-------------------------------------------------------------------------
@@ -139,13 +139,13 @@ Written by Darkain, modified by Chishm
 --------------------------------------------------------------------------*/
 void arm9_main (void) {
 	register int i;
-	
+
 	//set shared ram to ARM7
 	WRAM_CR = 0x03;
 	REG_EXMEMCNT = 0xE880;
 
 	arm9_stateFlag = ARM9_START;
-	
+
 	REG_IME = 0;
 	REG_IE = 0;
 	REG_IF = ~0;
@@ -156,7 +156,7 @@ void arm9_main (void) {
 		(*(vu32*)(i+0x00000000)) = 0x00000000;      //clear ITCM
 		(*(vu32*)(i+0x00800000)) = 0x00000000;      //clear DTCM
 	}
-	
+
 	for (i=16*1024; i<32*1024; i+=4) {  //second 16KB
 		(*(vu32*)(i+0x00000000)) = 0x00000000;      //clear ITCM
 	}
@@ -174,7 +174,7 @@ void arm9_main (void) {
 		TIMER_CR(i) = 0;
 		TIMER_DATA(i) = 0;
 	}
-	
+
 	// Clear out FIFO
 	REG_IPC_SYNC = 0;
 	REG_IPC_FIFO_CR = IPC_FIFO_ENABLE | IPC_FIFO_SEND_CLEAR;
@@ -223,7 +223,7 @@ void arm9_main (void) {
 			}
 		}
 	}
-		
+
 	// wait for vblank then boot
 	while(REG_VCOUNT!=191);
 	while(REG_VCOUNT==191);

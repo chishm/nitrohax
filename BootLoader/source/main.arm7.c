@@ -1,9 +1,9 @@
 /*
  main.arm7.c
- 
+
  By Michael Chisholm (Chishm)
- 
- All resetMemory and startBinary functions are based 
+
+ All resetMemory and startBinary functions are based
  on the MultiNDS loader by Darkain.
  Original source available at:
  http://cvs.sourceforge.net/viewcvs.py/ndslib/ndslib/examples/loader/boot/main.cpp
@@ -119,7 +119,7 @@ Modified by Chishm:
 void arm7_resetMemory (void) {
 	int i;
 	u8 settings1, settings2;
-	
+
 	REG_IME = 0;
 
 	for (i=0; i<16; i++) {
@@ -128,7 +128,7 @@ void arm7_resetMemory (void) {
 		SCHANNEL_SOURCE(i) = 0;
 		SCHANNEL_LENGTH(i) = 0;
 	}
-	SOUND_CR = 0;
+	REG_SOUNDCNT = 0;
 
 	// Clear out ARM7 DMA channels and timers
 	for (i=0; i<4; i++) {
@@ -146,7 +146,7 @@ void arm7_resetMemory (void) {
 
 	// clear IWRAM - 037F:8000 to 0380:FFFF, total 96KiB
 	arm7_clearmem ((void*)0x037F8000, 96*1024);
-	
+
 	// clear most of EXRAM - except after 0x023FD800, which has the ARM9 code
 	arm7_clearmem ((void*)0x02000000, 0x003FD800);
 
@@ -158,11 +158,11 @@ void arm7_resetMemory (void) {
 	(*(vu32*)(0x04000000-4)) = 0;  //IRQ_HANDLER ARM7 version
 	(*(vu32*)(0x04000000-8)) = ~0; //VBLANK_INTR_WAIT_FLAGS, ARM7 version
 	REG_POWERCNT = 1;  //turn off power to stuffs
-	
+
 	// Reload DS Firmware settings
 	arm7_readFirmware((u32)0x03FE70, &settings1, 0x1);
 	arm7_readFirmware((u32)0x03FF70, &settings2, 0x1);
-	
+
 	if (settings1 > settings2) {
 		arm7_readFirmware((u32)0x03FE00, (u8*)0x027FFC80, 0x70);
 		arm7_readFirmware((u32)0x03FF00, (u8*)0x027FFD80, 0x70);
@@ -170,8 +170,8 @@ void arm7_resetMemory (void) {
 		arm7_readFirmware((u32)0x03FF00, (u8*)0x027FFC80, 0x70);
 		arm7_readFirmware((u32)0x03FE00, (u8*)0x027FFD80, 0x70);
 	}
-	
-	// Load FW header 
+
+	// Load FW header
 	arm7_readFirmware((u32)0x000000, (u8*)0x027FF830, 0x20);
 }
 
@@ -179,21 +179,22 @@ void arm7_resetMemory (void) {
 int arm7_loadBinary (void) {
 	u32 chipID;
 	u32 errorCode;
-	
+
 	// Init card
 	errorCode = cardInit(ndsHeader, &chipID);
 	if (errorCode) {
 		return errorCode;
 	}
 
-	// Set memory values expected by loaded NDS	
+	// Set memory values expected by loaded NDS
 	*((u32*)0x027ff800) = chipID;					// CurrentCardID
 	*((u32*)0x027ff804) = chipID;					// Command10CardID
 	*((u16*)0x027ff808) = ndsHeader->headerCRC16;	// Header Checksum, CRC-16 of [000h-15Dh]
 	*((u16*)0x027ff80a) = ndsHeader->secureCRC16;	// Secure Area Checksum, CRC-16 of [ [20h]..7FFFh]
 	*((u16*)0x027ffc40) = 0x1;						// Booted from card -- EXTREMELY IMPORTANT!!! Thanks to cReDiAr
-	
-	cardRead(ndsHeader->arm9romSource, (u32*)ndsHeader->arm9destination, ndsHeader->arm9binarySize);	cardRead(ndsHeader->arm7romSource, (u32*)ndsHeader->arm7destination, ndsHeader->arm7binarySize);
+
+	cardRead(ndsHeader->arm9romOffset, (u32*)ndsHeader->arm9destination, ndsHeader->arm9binarySize);
+	cardRead(ndsHeader->arm7romOffset, (u32*)ndsHeader->arm7destination, ndsHeader->arm7binarySize);
 	return ERR_NONE;
 }
 
@@ -210,7 +211,7 @@ void arm7_startBinary (void)
 
 	while(REG_VCOUNT!=191);
 	while(REG_VCOUNT==191);
-	
+
 	// Get the ARM9 to boot
 	arm9_stateFlag = ARM9_BOOTBIN;
 
@@ -226,14 +227,14 @@ void arm7_startBinary (void)
 
 void arm7_main (void) {
 	int errorCode;
-	
+
 	// Wait for ARM9 to at least start
 	while (arm9_stateFlag < ARM9_START);
 
 	debugOutput (ERR_STS_CLR_MEM);
-	
+
 	// Get ARM7 to clear RAM
-	arm7_resetMemory();	
+	arm7_resetMemory();
 
 	debugOutput (ERR_STS_LOAD_BIN);
 
@@ -242,7 +243,7 @@ void arm7_main (void) {
 	if (errorCode) {
 		errorOutput(errorCode);
 	}
-	
+
 	debugOutput (ERR_STS_HOOK_BIN);
 
 	// Load the cheat engine and hook it into the ARM7 binary
@@ -250,11 +251,11 @@ void arm7_main (void) {
 	if (errorCode != ERR_NONE && errorCode != ERR_NOCHEAT) {
 		errorOutput(errorCode);
 	}
-	
+
 	debugOutput (ERR_STS_START);
 
 	arm7_startBinary();
-	
+
 	return;
 }
 

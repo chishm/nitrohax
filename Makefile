@@ -11,35 +11,29 @@ export TARGET		:=	NitroHax
 export TOPDIR		:=	$(CURDIR)
 
 export VERSION_MAJOR	:= 0
-export VERSION_MINOR	:= 92
+export VERSION_MINOR	:= 93
 export VERSTRING	:=	$(VERSION_MAJOR).$(VERSION_MINOR)
 
-#---------------------------------------------------------------------------------
-# path to tools - this can be deleted if you set the path in windows
-#---------------------------------------------------------------------------------
-export PATH		:=	$(DEVKITARM)/bin:$(PATH)
 
-.PHONY: $(TARGET).arm7 $(TARGET).arm9
+.PHONY: arm7/$(TARGET).elf arm9/$(TARGET).elf
 
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
 all: $(TARGET).nds
 
-$(TARGET).nds	:	$(TARGET).arm7 $(TARGET).arm9
-	ndstool	-c $(TARGET).nds -7 $(TARGET).arm7 -9 $(TARGET).arm9 \
+$(TARGET).nds	:	arm7/$(TARGET).elf arm9/$(TARGET).elf
+	ndstool	-c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
 			-b $(CURDIR)/icon.bmp "Nitro Hax;DS Game Cheat Tool;Created by Chishm"
 
 #---------------------------------------------------------------------------------
-$(TARGET).arm7	: arm7/$(TARGET).elf
-$(TARGET).arm9	: arm9/$(TARGET).elf
-
+# Create boot loader and link raw binary into ARM9 ELF
 #---------------------------------------------------------------------------------
 BootLoader/load.bin	:	BootLoader/source/*
 	$(MAKE) -C BootLoader
 
-#---------------------------------------------------------------------------------
 arm9/data/load.bin	:	BootLoader/load.bin
+	mkdir -p $(@D)
 	cp $< $@
 
 #---------------------------------------------------------------------------------
@@ -60,24 +54,16 @@ arm9/$(TARGET).elf	:	arm9/data/load.bin arm9/source/version.h
 	$(MAKE) -C arm9
 
 #---------------------------------------------------------------------------------
-dist-bin	:	$(TARGET).txt $(TARGET).nds License.txt
-	zip -X -9 $(TARGET)_v$(VERSTRING).zip $(TARGET).txt $(TARGET).nds License.txt
+dist-bin	: $(TARGET).nds README.md LICENSE
+	zip -X -9 $(TARGET)_v$(VERSTRING).zip $^
 
-dist-src	:
+dist-src	: Makefile
 	tar --exclude=*~ -cvjf $(TARGET)_src_v$(VERSTRING).tar.bz2 \
-	--transform 's,^,/'$(TARGET)'/,' \
-	Makefile icon.bmp License.txt NitroHax.txt \
+	--transform 's,^,$(TARGET)/,' \
+	Makefile icon.bmp LICENSE README.md \
 	arm7/Makefile arm7/source \
-	arm9/Makefile arm9/source arm9/data arm9/graphics \
+	arm9/Makefile arm9/source arm9/graphics \
 	BootLoader/Makefile BootLoader/load.ld BootLoader/source
-
-dist-legal	:	BootLoader/load.bin
-	tar --exclude=*~ --exclude=read_card.c -cvjf $(TARGET)_src_v$(VERSTRING).tar.bz2 \
-	--transform 's,^,/'$(TARGET)'/,' \
-	Makefile icon.bmp License.txt NitroHax.txt \
-	arm7/Makefile arm7/source \
-	arm9/Makefile arm9/source arm9/data arm9/graphics \
-	BootLoader/Makefile BootLoader/source BootLoader/load.bin
 
 dist	:	dist-bin dist-src
 

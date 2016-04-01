@@ -31,7 +31,7 @@ CFLAGS	:=	-g -Wall -O2\
 CFLAGS	+=	$(INCLUDE) -DARM7
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	:=	-nostartfiles -T$(CURDIR)/../load.ld -g $(ARCH) -mno-fpu -Wl,-Map,$(TARGET).map
+LDFLAGS	:=	-nostartfiles -T$(CURDIR)/../load.ld -g $(ARCH) -Wl,-Map,$(TARGET).map
 
 LIBS	:= -lnds7
 
