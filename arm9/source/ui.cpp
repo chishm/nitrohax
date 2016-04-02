@@ -396,12 +396,12 @@ void UserInterface::writeTextBox (TEXT_TYPE textType, const char* str, va_list a
 	clearMessage (textType);
 	if (textType == TEXT_TITLE) {
 		wordWrap (dispStr, TITLE_BOX_END_ROW - TITLE_BOX_START_ROW - 2, LAST_COL - FIRST_COL - 2);
-		lastRow = topText->putText (dispStr, TITLE_BOX_START_ROW + 1, FIRST_COL + 1,
+		lastRow = topText->putText (dispStr, FIRST_COL + 1,
 			TITLE_BOX_END_ROW - 1, LAST_COL - 1, TITLE_BOX_START_ROW + 1, FIRST_COL + 1);
 		drawBox (TITLE_BOX_START_ROW, FIRST_COL, lastRow + 1, LAST_COL);
 	} else {
 		wordWrap (dispStr, TEXT_BOX_END_ROW - TEXT_BOX_START_ROW - 2, LAST_COL - FIRST_COL - 2);
-		lastRow = topText->putText (dispStr, TEXT_BOX_START_ROW + 1, FIRST_COL + 1,
+		lastRow = topText->putText (dispStr, FIRST_COL + 1,
 			TEXT_BOX_END_ROW - 1, LAST_COL - 1, TEXT_BOX_START_ROW + 1, FIRST_COL + 1);
 		drawBox (TEXT_BOX_START_ROW, FIRST_COL, lastRow + 1, LAST_COL);
 	}
@@ -514,13 +514,13 @@ void UserInterface::showCheatFolder (std::vector<CheatBase*> &contents)
 	for (int curItem = 0; curItem <= menuLength; curItem++) {
 		if (CHEAT_MENU_FOLDER_UP == menuLevel.top + curItem) {
 				putButtonBg (BUTTON_BG_FOLDER, (MENU_FIRST_ROW + curItem) * 2);
-			subText->putText (CHEAT_MENU_FOLDER_UP_NAME, (MENU_FIRST_ROW + curItem) * 2,
-				MENU_FIRST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_LAST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_FIRST_COL);
+			subText->putText (CHEAT_MENU_FOLDER_UP_NAME, MENU_FIRST_COL,
+				(MENU_FIRST_ROW + curItem) * 2, MENU_LAST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_FIRST_COL);
 		} else {
 			CheatCode* cheatCode = dynamic_cast<CheatCode*>(contents[menuLevel.top + curItem]);
 
-			subText->putText (contents[menuLevel.top + curItem]->getName(), (MENU_FIRST_ROW + curItem) * 2,
-				MENU_FIRST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_LAST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_FIRST_COL);
+			subText->putText (contents[menuLevel.top + curItem]->getName(), MENU_FIRST_COL,
+				(MENU_FIRST_ROW + curItem) * 2, MENU_LAST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_FIRST_COL);
 
 			if (cheatCode) {
 				if (cheatCode->getEnabledStatus()) {
@@ -539,10 +539,8 @@ void UserInterface::showCheatFolder (std::vector<CheatBase*> &contents)
 
 void UserInterface::cheatMenu (CheatFolder* gameCodes, CheatFolder* top)
 {
-	touchPosition touchXY;
 	menuLevel.top = 0;
 	menuLevel.selected = 0;
-	int pressed;
 
 	std::stack<UserInterface::MENU_LEVEL> menuLevelStack;
 
@@ -553,47 +551,9 @@ void UserInterface::cheatMenu (CheatFolder* gameCodes, CheatFolder* top)
 	showCursor (true);
 	showGoButton(true, GO_BUTTON_COL, GO_BUTTON_ROW);
 
-	do {
-		swiWaitForVBlank();
-		scanKeys();
-		pressed = keysDown();
-		touchRead(&touchXY);
+	int pressed;
 
-		// Touch screen stuff
-		if (pressed & KEY_TOUCH) {
-			if ((touchXY.px < (SCROLLBAR_COL * TOUCH_GRID_SIZE)) &&
-				(touchXY.py >= (MENU_FIRST_ROW * TOUCH_GRID_SIZE)) &&
-				(touchXY.py < ((MENU_FIRST_ROW + menuLevel.bottom - menuLevel.top + 1) * TOUCH_GRID_SIZE)))
-			{
-				// Touched an item
-				menuLevel.selected = (touchXY.py / TOUCH_GRID_SIZE) + menuLevel.top - MENU_FIRST_ROW;
-				pressed = BUTTON_SELECT;
-			}
-			if (touchXY.px >= (SCROLLBAR_COL * TOUCH_GRID_SIZE) && touchXY.px < ((SCROLLBAR_COL+1) * TOUCH_GRID_SIZE)) {
-				if ((touchXY.py >= (SCROLLBAR_START) * TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_START + 1) * TOUCH_GRID_SIZE)) {
-					// Touched up arrow
-					pressed = BUTTON_LINE_UP;
-				} else if ((touchXY.py >= SCROLLBAR_END * TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_END + 1) * TOUCH_GRID_SIZE)) {
-					// Touched down arrow
-					pressed = BUTTON_LINE_DOWN;
-				} else if ((touchXY.py >= (SCROLLBAR_START + 1) * TOUCH_GRID_SIZE) && (touchXY.py < scrollboxPosition)) {
-					// Touched scrollbar above scrollbox
-					pressed = BUTTON_PAGE_UP;
-				} else if ((touchXY.py >= scrollboxPosition + TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_END) * TOUCH_GRID_SIZE)) {
-					// Touched scrollbar below scrollbox
-					pressed = BUTTON_PAGE_DOWN;
-				}
-			}
-			if ((touchXY.px >= (GO_BUTTON_COL * TOUCH_GRID_SIZE / 2)) &&
-				(touchXY.px < ((GO_BUTTON_COL + GO_BUTTON_WIDTH) * TOUCH_GRID_SIZE / 2)) &&
-				(touchXY.py >= (GO_BUTTON_ROW * TOUCH_GRID_SIZE / 2)) &&
-				(touchXY.py < ((GO_BUTTON_ROW + GO_BUTTON_HEIGHT) * TOUCH_GRID_SIZE / 2)))
-			{
-				// Touched the go button
-				pressed = BUTTON_EXIT;
-			}
-		}
-
+	while ((pressed = menuInput(true)) != BUTTON_EXIT) {
 		if (pressed == BUTTON_LINE_DOWN) {
 			if (menuLevel.selected < (int)contents.size()-1) {
 				menuLevel.selected ++;
@@ -698,7 +658,7 @@ void UserInterface::cheatMenu (CheatFolder* gameCodes, CheatFolder* top)
 		} else {
 			showMessage (TEXT_INFO, "%s\n\n%s", contents[menuLevel.selected]->getName(), contents[menuLevel.selected]->getNote());
 		}
-	} while (!(pressed == BUTTON_EXIT));
+	}
 
 	clearMessage ();
 	clearFolderBackground();
@@ -772,8 +732,9 @@ void UserInterface::showFileFolder (std::vector<UserInterface::FileInfo> &conten
 	}
 
 	for (int curItem = 0; curItem <= menuLength; curItem++) {
-		subText->putText (contents[menuLevel.top + curItem].filename.c_str(), (MENU_FIRST_ROW + curItem) * 2,
-			MENU_FIRST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_LAST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_FIRST_COL);
+		subText->putText (contents[menuLevel.top + curItem].filename.c_str(),
+			MENU_FIRST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_LAST_COL,
+			(MENU_FIRST_ROW + curItem) * 2, MENU_FIRST_COL);
 
 		if (contents[menuLevel.top + curItem].isDirectory) {
 			putButtonBg (BUTTON_BG_FOLDER, (MENU_FIRST_ROW + curItem) * 2);
@@ -783,12 +744,69 @@ void UserInterface::showFileFolder (std::vector<UserInterface::FileInfo> &conten
 	}
 }
 
+int UserInterface::menuInput(bool enableGoButton)
+{
+	int pressed;
+	touchPosition touchXY;
+
+	swiWaitForVBlank();
+	scanKeys();
+	pressed = keysDown();
+	touchRead(&touchXY);
+
+	// Touch screen stuff
+	if (pressed & KEY_TOUCH) {
+		if ((touchXY.px < (SCROLLBAR_COL * TOUCH_GRID_SIZE)) &&
+#if MENU_FIRST_ROW > 0
+			(touchXY.py >= (MENU_FIRST_ROW * TOUCH_GRID_SIZE)) &&
+#endif
+			(touchXY.py < ((MENU_FIRST_ROW + menuLevel.bottom - menuLevel.top + 1) * TOUCH_GRID_SIZE)))
+		{
+			// Touched an item
+			menuLevel.selected = (touchXY.py / TOUCH_GRID_SIZE) + menuLevel.top - MENU_FIRST_ROW;
+			pressed = BUTTON_SELECT;
+		}
+		if (touchXY.px >= (SCROLLBAR_COL * TOUCH_GRID_SIZE) && touchXY.px < ((SCROLLBAR_COL+1) * TOUCH_GRID_SIZE)) {
+			if (
+#if SCROLLBAR_START > 0
+					(touchXY.py >= (SCROLLBAR_START) * TOUCH_GRID_SIZE) &&
+#endif
+					(touchXY.py < (SCROLLBAR_START + 1) * TOUCH_GRID_SIZE))
+			{
+				// Touched up arrow
+				pressed = BUTTON_LINE_UP;
+			} else if ((touchXY.py >= SCROLLBAR_END * TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_END + 1) * TOUCH_GRID_SIZE)) {
+				// Touched down arrow
+				pressed = BUTTON_LINE_DOWN;
+			} else if ((touchXY.py >= (SCROLLBAR_START + 1) * TOUCH_GRID_SIZE) && (touchXY.py < scrollboxPosition)) {
+				// Touched scrollbar above scrollbox
+				pressed = BUTTON_PAGE_UP;
+			} else if ((touchXY.py >= scrollboxPosition + TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_END) * TOUCH_GRID_SIZE)) {
+				// Touched scrollbar below scrollbox
+				pressed = BUTTON_PAGE_DOWN;
+			}
+		}
+		if (enableGoButton)
+		{
+			if ((touchXY.px >= (GO_BUTTON_COL * TOUCH_GRID_SIZE / 2)) &&
+				(touchXY.px < ((GO_BUTTON_COL + GO_BUTTON_WIDTH) * TOUCH_GRID_SIZE / 2)) &&
+				(touchXY.py >= (GO_BUTTON_ROW * TOUCH_GRID_SIZE / 2)) &&
+				(touchXY.py < ((GO_BUTTON_ROW + GO_BUTTON_HEIGHT) * TOUCH_GRID_SIZE / 2)))
+			{
+				// Touched the go button
+				pressed = BUTTON_EXIT;
+			}
+		}
+	}
+
+	return pressed;
+}
+
 std::string UserInterface::fileBrowser (const char* extension)
 {
-	touchPosition touchXY;
 	menuLevel.top = 0;
 	menuLevel.selected = 0;
-	int pressed;
+
 	std::vector<UserInterface::FileInfo> contents;
 	std::string filename;
 	char* cwd = new char[MAXPATHLEN];
@@ -806,39 +824,9 @@ std::string UserInterface::fileBrowser (const char* extension)
 		showMessage (TEXT_TITLE, "Open file");
 	}
 
-	do {
-		swiWaitForVBlank();
-		scanKeys();
-		pressed = keysDown();
-		touchRead(&touchXY);
+	int pressed;
 
-		// Touch screen stuff
-		if (pressed & KEY_TOUCH) {
-			if ((touchXY.px < (SCROLLBAR_COL * TOUCH_GRID_SIZE)) &&
-				(touchXY.py >= (MENU_FIRST_ROW * TOUCH_GRID_SIZE)) &&
-				(touchXY.py < ((MENU_FIRST_ROW + menuLevel.bottom - menuLevel.top + 1) * TOUCH_GRID_SIZE)))
-			{
-				// Touched an item
-				menuLevel.selected = (touchXY.py / TOUCH_GRID_SIZE) + menuLevel.top - MENU_FIRST_ROW;
-				pressed = BUTTON_SELECT;
-			}
-			if (touchXY.px >= (SCROLLBAR_COL * TOUCH_GRID_SIZE) && touchXY.px < ((SCROLLBAR_COL+1) * TOUCH_GRID_SIZE)) {
-				if ((touchXY.py >= (SCROLLBAR_START) * TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_START + 1) * TOUCH_GRID_SIZE)) {
-					// Touched up arrow
-					pressed = BUTTON_LINE_UP;
-				} else if ((touchXY.py >= SCROLLBAR_END * TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_END + 1) * TOUCH_GRID_SIZE)) {
-					// Touched down arrow
-					pressed = BUTTON_LINE_DOWN;
-				} else if ((touchXY.py >= (SCROLLBAR_START + 1) * TOUCH_GRID_SIZE) && (touchXY.py < scrollboxPosition)) {
-					// Touched scrollbar above scrollbox
-					pressed = BUTTON_PAGE_UP;
-				} else if ((touchXY.py >= scrollboxPosition + TOUCH_GRID_SIZE) && (touchXY.py < (SCROLLBAR_END) * TOUCH_GRID_SIZE)) {
-					// Touched scrollbar below scrollbox
-					pressed = BUTTON_PAGE_DOWN;
-				}
-			}
-		}
-
+	while ((pressed = menuInput(false)) != BUTTON_EXIT) {
 		if (pressed == BUTTON_LINE_DOWN) {
 			if (menuLevel.selected < (int)contents.size()-1) {
 				menuLevel.selected ++;
@@ -917,7 +905,7 @@ std::string UserInterface::fileBrowser (const char* extension)
 		setScrollbarPosition (menuLevel.selected, (int)contents.size()-1);
 		getcwd (cwd, MAXPATHLEN);
 		showMessage (TEXT_INFO, "%s\n%s", cwd, contents[menuLevel.selected].filename.c_str());
-	} while (!(pressed == BUTTON_EXIT));
+	}
 
 	delete [] cwd;
 

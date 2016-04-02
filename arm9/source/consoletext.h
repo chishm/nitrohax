@@ -18,7 +18,7 @@
 
 #include <nds/ndstypes.h>
 
-class ConsoleText 
+class ConsoleText
 {
 public:
 	enum CHAR_SIZE {CHAR_SIZE_8PX, CHAR_SIZE_16PX};
@@ -29,12 +29,12 @@ public:
 	void clearText (void);
 	void clearText (int startRow, int startCol, int endRow, int endCol);
 	void putText (const char* str);
-	int  putText (const char* str, int startRow, int startCol, int endRow, int endCol, int curRow, int curCol);
-	int  putText (const char* str, int startRow, int startCol, int endRow, int endCol)
+	int  putText (const char* str, int startCol, int endRow, int endCol, int curRow, int curCol);
+	int  putText (const char* str, int startCol, int endRow, int endCol)
 	{
-		return putText (str, startRow, startCol, endRow, endCol, row, col);
+		return putText (str, startCol, endRow, endCol, row, col);
 	}
-	
+
 	void putChar (char chr);
 	void putChar (char chr, int row, int col);
 	void putTile (int val, int row, int col, int palette);

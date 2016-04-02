@@ -61,17 +61,17 @@ void ConsoleText::setPosition (int row, int col)
 
 void ConsoleText::putText (const char* str)
 {
-	putText (str, 0, 0, height-1, width-1);
+	putText (str, 0, height-1, width-1);
 }
 
-int ConsoleText::putText (const char* str, int startRow, int startCol, int endRow, int endCol, int curRow, int curCol)
+int ConsoleText::putText (const char* str, int startCol, int endRow, int endCol, int curRow, int curCol)
 {
 	int pos = 0;
 	int len = strlen (str);
 	row = curRow;
 	col = curCol;
 	char curChar;
-	
+
 	while (pos < len) {
 		curChar = str[pos];
 		switch (curChar) {
@@ -91,19 +91,19 @@ int ConsoleText::putText (const char* str, int startRow, int startCol, int endRo
 					row++;
 					col = startCol;
 				}
-				
+
 				if (row > endRow) {
 					// Overflowed the screen so bail out
 					return row;
 				}
-				
+
 				putChar (curChar, row, col);
 				col++;
 				break;
 		}
 		pos++;
 	}
-	
+
 	return row;
 }
 

@@ -57,7 +57,7 @@ arm9/$(TARGET).elf	:	arm9/data/load.bin arm9/source/version.h
 dist-bin	: $(TARGET).nds README.md LICENSE
 	zip -X -9 $(TARGET)_v$(VERSTRING).zip $^
 
-dist-src	: Makefile
+dist-src	:
 	tar --exclude=*~ -cvjf $(TARGET)_src_v$(VERSTRING).tar.bz2 \
 	--transform 's,^,$(TARGET)/,' \
 	Makefile icon.bmp LICENSE README.md \

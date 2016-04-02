@@ -41,11 +41,14 @@ static inline void ensure (bool condition, const char* errorMsg) {
 	}
 
 	return;
-}	
+}
 
 //---------------------------------------------------------------------------------
 int main(int argc, const char* argv[])
 {
+    (void)argc;
+    (void)argv;
+
 	u32 ndsHeader[0x80];
 	u32* cheatDest;
 	int curCheat = 0;
@@ -54,7 +57,7 @@ int main(int argc, const char* argv[])
 	std::string filename;
 	int c;
 	FILE* cheatFile;
-	
+
 	ui.showMessage (UserInterface::TEXT_TITLE, TITLE_STRING);
 
 #ifdef DEMO
@@ -73,22 +76,22 @@ int main(int argc, const char* argv[])
 		filename = ui.fileBrowser (".xml");
 		ensure (filename.size() > 0, "No file specified");
 		cheatFile = fopen (filename.c_str(), "rb");
-		ensure (cheatFile != NULL, "Couldn't load cheats"); 
+		ensure (cheatFile != NULL, "Couldn't load cheats");
 	}
-	
+
 	ui.showMessage (UserInterface::TEXT_TITLE, TITLE_STRING);
 	ui.showMessage ("Loading codes");
-	
+
 	c = fgetc(cheatFile);
 	ensure (c != 0xFF && c != 0xFE, "File is in an unsupported unicode encoding");
 	fseek (cheatFile, 0, SEEK_SET);
-	
+
 	CheatCodelist* codelist = new CheatCodelist();
 	ensure (codelist->load(cheatFile), "Can't read cheat list\n");
 	fclose (cheatFile);
 
 	ui.showMessage (UserInterface::TEXT_TITLE, TITLE_STRING);
-	
+
 	sysSetCardOwner (BUS_OWNER_ARM9);
 
 	ui.showMessage ("Loaded codes\nYou can remove your flash card\nRemove DS Card");
@@ -106,8 +109,8 @@ int main(int argc, const char* argv[])
 	// Delay half a second for the DS card to stabilise
 	for (int i = 0; i < 30; i++) {
 		swiWaitForVBlank();
-	}	
-	
+	}
+
 	getHeader (ndsHeader);
 
 	ui.showMessage ("Finding game");
@@ -115,23 +118,23 @@ int main(int argc, const char* argv[])
 	memcpy (gameid, ((const char*)ndsHeader) + 12, 4);
 	headerCRC = crc32((const char*)ndsHeader, sizeof(ndsHeader));
 	CheatFolder *gameCodes = codelist->getGame (gameid, headerCRC);
-	
+
 	if (!gameCodes) {
 		gameCodes = codelist;
 	}
-	
+
 	ui.cheatMenu (gameCodes, gameCodes);
-	
+
 
 	cheatDest = (u32*) malloc(CHEAT_MAX_DATA_SIZE);
 	ensure (cheatDest != NULL, "Bad malloc\n");
-	
+
 	std::list<CheatWord> cheatList = gameCodes->getEnabledCodeData();
-	
+
 	for (std::list<CheatWord>::iterator cheat = cheatList.begin(); cheat != cheatList.end(); cheat++) {
 		cheatDest[curCheat++] = (*cheat);
 	}
-	
+
 	ui.showMessage (UserInterface::TEXT_TITLE, TITLE_STRING);
 	ui.showMessage ("Running game");
 

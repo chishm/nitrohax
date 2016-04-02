@@ -27,6 +27,12 @@
 #include "encryption.h"
 #include "common.h"
 
+typedef union
+{
+	char title[4];
+	u32 key;
+} GameCode;
+
 static u32 portFlags = 0;
 static u32 secureAreaData[CARD_SECURE_AREA_SIZE/sizeof(u32)];
 
@@ -134,6 +140,7 @@ int cardInit (tNDSHeader* ndsHeader, u32* chipID)
 	int secureBlockNumber;
 	int i;
 	u8 cmdData[8] __attribute__ ((aligned));
+	GameCode* gameCode;
 
 	// Dummy command sent after card reset
 	cardParamCommand (CARD_CMD_DUMMY, 0,
@@ -146,7 +153,7 @@ int cardInit (tNDSHeader* ndsHeader, u32* chipID)
 		(uint32*)ndsHeader, sizeof(tNDSHeader));
 
 	// Check header CRC
-	if (ndsHeader->headerCRC16 != swiCRC16(0xFFFF, ndsHeader, 0x15E)) {
+	if (ndsHeader->headerCRC16 != swiCRC16(0xFFFF, (void*)ndsHeader, 0x15E)) {
 		return ERR_HEAD_CRC;
 	}
 
@@ -156,7 +163,8 @@ int cardInit (tNDSHeader* ndsHeader, u32* chipID)
 	}
 
 	// Initialise blowfish encryption for KEY1 commands and decrypting the secure area
-	init_keycode (*((u32*)&ndsHeader->gameCode), 2, 8);
+	gameCode = (GameCode*)ndsHeader->gameCode;
+	init_keycode (gameCode->key, 2, 8);
 
 	// Port 40001A4h setting for normal reads (command B7)
 	portFlags = ndsHeader->cardControl13 & ~CARD_BLK_SIZE(7);
@@ -245,7 +253,7 @@ int cardInit (tNDSHeader* ndsHeader, u32* chipID)
 	}
 
 	// Now deal with secure area decryption and verification
-	decryptSecureArea (*((u32*)&ndsHeader->gameCode), secureAreaData);
+	decryptSecureArea (gameCode->key, secureAreaData);
 
 	secureArea = secureAreaData;
 	if (secureArea[0] == 0x72636e65 /*'encr'*/ && secureArea[1] == 0x6a624f79 /*'yObj'*/) {
