@@ -35,7 +35,8 @@ BEGIN_ASM_FUNC arm7_clearmem
 	mov    r9, #0
 
 clearmem_loop:
-	stmia  r0!, {r2-r9}	cmp    r0, r1
+	stmia  r0!, {r2-r9}
+	cmp    r0, r1
 	blt    clearmem_loop
 
 	ldmfd  sp!, {r4-r9}
