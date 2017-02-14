@@ -14,6 +14,7 @@
 @   You should have received a copy of the GNU General Public License
 @   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <nds/asminc.h>
 .arm
 
 .global cheat_engine_start
@@ -31,7 +32,7 @@ intr_orig_return_offset:
 	
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-cheat_engine_start:
+BEGIN_ASM_FUNC cheat_engine_start
 @ Hook the return address, then go back to the original function
 	stmdb	sp!, {lr}
 	adr 	lr, code_handler_start

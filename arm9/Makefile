@@ -23,10 +23,10 @@ DATA		:=	data
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-mthumb -mthumb-interwork
+ARCH	:=	-march=armv5te -mtune=arm946e-s -mthumb -mthumb-interwork
 
 CFLAGS	:=	-g -Wall -O2\
- 			-march=armv5te -mtune=arm946e-s -fomit-frame-pointer\
+			-fomit-frame-pointer\
 			-ffast-math \
 			-Wall -Wextra -Werror \
 			$(ARCH)
@@ -34,7 +34,7 @@ CFLAGS	:=	-g -Wall -O2\
 CFLAGS	+=	$(INCLUDE) -DARM9
 CXXFLAGS	:=	$(CFLAGS)
 
-ASFLAGS	:=	-g $(ARCH) -march=armv5te -mtune=arm946e-s
+ASFLAGS	:=	-g $(ARCH) $(INCLUDE)
 
 LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 

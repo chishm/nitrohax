@@ -1,0 +1,8 @@
+BootLoader/build
+BootLoader/load.bin
+arm7/build
+arm9/build/
+arm9/data/
+arm9/source/version.h
+*.nds
+*.elf

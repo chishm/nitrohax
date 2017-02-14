@@ -15,12 +15,20 @@ export VERSION_MINOR	:= 93
 export VERSTRING	:=	$(VERSION_MAJOR).$(VERSION_MINOR)
 
 
-.PHONY: arm7/$(TARGET).elf arm9/$(TARGET).elf
+.PHONY: checkarm7 checkarm9
 
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-all: $(TARGET).nds
+all: checkarm7 checkarm9 $(TARGET).nds
+
+#---------------------------------------------------------------------------------
+checkarm7:
+	$(MAKE) -C arm7
+
+#---------------------------------------------------------------------------------
+checkarm9:
+	$(MAKE) -C arm9
 
 $(TARGET).nds	:	arm7/$(TARGET).elf arm9/$(TARGET).elf
 	ndstool	-c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
