@@ -189,6 +189,7 @@ int arm7_loadBinary (void) {
 	// Set memory values expected by loaded NDS
 	*((u32*)0x027ff800) = chipID;					// CurrentCardID
 	*((u32*)0x027ff804) = chipID;					// Command10CardID
+	*((u32*)0x027ffc00) = chipID;					// 3rd chip ID
 	*((u16*)0x027ff808) = ndsHeader->headerCRC16;	// Header Checksum, CRC-16 of [000h-15Dh]
 	*((u16*)0x027ff80a) = ndsHeader->secureCRC16;	// Secure Area Checksum, CRC-16 of [ [20h]..7FFFh]
 	*((u16*)0x027ffc40) = 0x1;						// Booted from card -- EXTREMELY IMPORTANT!!! Thanks to cReDiAr
