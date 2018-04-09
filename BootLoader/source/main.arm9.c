@@ -152,15 +152,6 @@ void arm9_main (void) {
 	(*(vu32*)0x00803FFC) = 0;   //IRQ_HANDLER ARM9 version
 	(*(vu32*)0x00803FF8) = ~0;  //VBLANK_INTR_WAIT_FLAGS ARM9 version
 
-	//clear out ARM9 DMA channels
-	for (i=0; i<4; i++) {
-		DMA_CR(i) = 0;
-		DMA_SRC(i) = 0;
-		DMA_DEST(i) = 0;
-		TIMER_CR(i) = 0;
-		TIMER_DATA(i) = 0;
-	}
-
 	// Clear out FIFO
 	REG_IPC_FIFO_CR = IPC_FIFO_ENABLE | IPC_FIFO_SEND_CLEAR;
 	REG_IPC_FIFO_CR = 0;
@@ -187,6 +178,15 @@ void arm9_main (void) {
 	for (i=0; i<43; i++) {
 		mainregs[i] = 0;
 		subregs[i] = 0;
+	}
+
+	// Clear out ARM9 DMA channels
+	for (i=0; i<4; i++) {
+		DMA_CR(i) = 0;
+		DMA_SRC(i) = 0;
+		DMA_DEST(i) = 0;
+		TIMER_CR(i) = 0;
+		TIMER_DATA(i) = 0;
 	}
 
 	REG_DISPSTAT = 0;
