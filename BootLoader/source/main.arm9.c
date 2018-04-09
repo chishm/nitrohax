@@ -156,6 +156,7 @@ void arm9_main (void) {
 	REG_IPC_FIFO_CR = IPC_FIFO_ENABLE | IPC_FIFO_SEND_CLEAR;
 	REG_IPC_FIFO_CR = 0;
 
+	// Blank out VRAM
 	VRAM_A_CR = 0x80;
 	VRAM_B_CR = 0x80;
 // Don't mess with the VRAM used for execution
