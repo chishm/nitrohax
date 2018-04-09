@@ -58,25 +58,11 @@ tNDSHeader* ndsHeader = (tNDSHeader*)NDS_HEAD;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Used for debugging purposes
 static void errorOutput (u32 code) {
-	// Wait until the ARM9 is ready
-	while (arm9_stateFlag != ARM9_READY);
-	// Set the error code, then tell ARM9 to display it
+	// Set the error code, then set our state to "error"
 	arm9_errorCode = code;
-	arm9_errorClearBG = true;
-	arm9_stateFlag = ARM9_DISPERR;
+	ipcSendState(ARM7_ERR);
 	// Stop
 	while(1);
-}
-
-static void debugOutput (u32 code) {
-	// Wait until the ARM9 is ready
-	while (arm9_stateFlag != ARM9_READY);
-	// Set the error code, then tell ARM9 to display it
-	arm9_errorCode = code;
-	arm9_errorClearBG = false;
-	arm9_stateFlag = ARM9_DISPERR;
-	// Wait for completion
-	while (arm9_stateFlag != ARM9_READY);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -229,15 +215,19 @@ void arm7_startBinary (void)
 void arm7_main (void) {
 	int errorCode;
 
-	// Wait for ARM9 to at least start
-	while (arm9_stateFlag < ARM9_START);
+	// Synchronise start
+	while (ipcRecvState() != ARM9_START);
+	ipcSendState(ARM7_START);
 
-	debugOutput (ERR_STS_CLR_MEM);
+	// Wait until ARM9 is ready
+	while (ipcRecvState() != ARM9_READY);
+
+	ipcSendState(ARM7_MEMCLR);
 
 	// Get ARM7 to clear RAM
 	arm7_resetMemory();
 
-	debugOutput (ERR_STS_LOAD_BIN);
+	ipcSendState(ARM7_LOADBIN);
 
 	// Load the NDS file
 	errorCode = arm7_loadBinary();
@@ -245,7 +235,7 @@ void arm7_main (void) {
 		errorOutput(errorCode);
 	}
 
-	debugOutput (ERR_STS_HOOK_BIN);
+	ipcSendState(ARM7_HOOKBIN);
 
 	// Load the cheat engine and hook it into the ARM7 binary
 	errorCode = arm7_hookGame(ndsHeader, (const u32*)CHEAT_DATA_LOCATION, (u32*)CHEAT_ENGINE_LOCATION);
@@ -253,9 +243,8 @@ void arm7_main (void) {
 		errorOutput(errorCode);
 	}
 
-	debugOutput (ERR_STS_START);
-
 	arm7_startBinary();
+	ipcSendState(ARM7_BOOTBIN);
 
 	return;
 }

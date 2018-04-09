@@ -52,9 +52,13 @@ extern void arm9_clearCache (void);
 /*-------------------------------------------------------------------------
 arm9_errorOutput
 Displays an error code on screen.
+
+Each box is 2 bits, and left-to-right is most-significant bits to least.
+Red = 00, Yellow = 01, Green = 10, Blue = 11
+
 Written by Chishm
 --------------------------------------------------------------------------*/
-static void arm9_errorOutput (u32 code, bool clearBG) {
+static void arm9_errorOutput (u32 code) {
 	int i, j, k;
 	u16 colour;
 
@@ -62,11 +66,9 @@ static void arm9_errorOutput (u32 code, bool clearBG) {
 	REG_DISPCNT = MODE_FB0;
 	VRAM_A_CR = VRAM_ENABLE;
 
-	if (clearBG) {
-		// Clear display
-		for (i = 0; i < 256*192; i++) {
-			VRAM_A[i] = 0x0000;
-		}
+	// Clear display
+	for (i = 0; i < 256*192; i++) {
+		VRAM_A[i] = 0x0000;
 	}
 
 	// Draw boxes of colour, signifying error codes
@@ -144,11 +146,16 @@ void arm9_main (void) {
 	WRAM_CR = 0x03;
 	REG_EXMEMCNT = 0xE880;
 
-	arm9_stateFlag = ARM9_START;
-
+	// Disable interrupts
 	REG_IME = 0;
 	REG_IE = 0;
 	REG_IF = ~0;
+
+	// Synchronise start
+	ipcSendState(ARM9_START);
+	while (ipcRecvState() != ARM7_START);
+
+	ipcSendState(ARM9_MEMCLR);
 
 	arm9_clearCache();
 
@@ -160,8 +167,6 @@ void arm9_main (void) {
 	for (i=16*1024; i<32*1024; i+=4) {  //second 16KB
 		(*(vu32*)(i+0x00000000)) = 0x00000000;      //clear ITCM
 	}
-
-	arm9_stateFlag = ARM9_MEMCLR;
 
 	(*(vu32*)0x00803FFC) = 0;   //IRQ_HANDLER ARM9 version
 	(*(vu32*)0x00803FF8) = ~0;  //VBLANK_INTR_WAIT_FLAGS ARM9 version
@@ -176,7 +181,6 @@ void arm9_main (void) {
 	}
 
 	// Clear out FIFO
-	REG_IPC_SYNC = 0;
 	REG_IPC_FIFO_CR = IPC_FIFO_ENABLE | IPC_FIFO_SEND_CLEAR;
 	REG_IPC_FIFO_CR = 0;
 
@@ -213,14 +217,13 @@ void arm9_main (void) {
 	VRAM_I_CR = 0;
 	REG_POWERCNT  = 0x820F;
 
-	// set ARM9 state to ready and wait for it to change again
-	arm9_stateFlag = ARM9_READY;
-	while ( arm9_stateFlag != ARM9_BOOTBIN ) {
-		if (arm9_stateFlag == ARM9_DISPERR) {
-			arm9_errorOutput (arm9_errorCode, arm9_errorClearBG);
-			if ( arm9_stateFlag == ARM9_DISPERR) {
-				arm9_stateFlag = ARM9_READY;
-			}
+	// set ARM9 state to ready and wait for instructions from ARM7
+	ipcSendState(ARM9_READY);
+	while (ipcRecvState() != ARM7_BOOTBIN) {
+		if (ipcRecvState() == ARM7_ERR) {
+			arm9_errorOutput (arm9_errorCode);
+			// Halt after displaying error code
+			while(1);
 		}
 	}
 
