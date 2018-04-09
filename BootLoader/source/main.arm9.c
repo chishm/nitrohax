@@ -198,10 +198,16 @@ void arm9_main (void) {
 	BG_PALETTE[0] = 0xFFFF;
 	dmaFill((void*)&arm9_BLANK_RAM, BG_PALETTE+1, (2*1024)-2);
 	dmaFill((void*)&arm9_BLANK_RAM, OAM,     2*1024);
-	dmaFill((void*)&arm9_BLANK_RAM, (void*)0x04000000, 0x56);  //clear main display registers
-	dmaFill((void*)&arm9_BLANK_RAM, (void*)0x04001000, 0x56);  //clear sub  display registers
 	dmaFill((void*)&arm9_BLANK_RAM, VRAM_A,  256*1024);		// Banks A, B
 	dmaFill((void*)&arm9_BLANK_RAM, VRAM_D,  272*1024);		// Banks D, E, F, G, H, I
+
+	// Clear out display registers
+	vu16 *mainregs = (vu16*)0x04000000;
+	vu16 *subregs = (vu16*)0x04001000;
+	for (i=0; i<43; i++) {
+		mainregs[i] = 0;
+		subregs[i] = 0;
+	}
 
 	REG_DISPSTAT = 0;
 	videoSetMode(0);
