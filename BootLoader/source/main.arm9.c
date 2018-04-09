@@ -94,40 +94,20 @@ static void arm9_errorOutput (u32 code) {
 		}
 	}
 
-	if ((code >> 8) != 0) {
-		// Low 16 bits
-		for (i = 0; i < 8; i++) {						// Pair of bits to use
-			if (((code>>(14-2*i))&3) == 0) {
-				colour = 0x001F; // Red
-			} else if (((code>>(14-2*i))&3) == 1) {
-				colour = 0x03FF; // Yellow
-			} else if (((code>>(14-2*i))&3) == 2) {
-				colour = 0x03E0; // Green
-			} else {
-				colour = 0x7C00; // Blue
-			}
-			for (j = 103; j < 119; j++) { 				// Row
-				for (k = 32*i+8; k < 32*i+24; k++) {	// Column
-					VRAM_A[j*256+k] = colour;
-				}
-			}
+	// Low 16 bits
+	for (i = 0; i < 8; i++) {						// Pair of bits to use
+		if (((code>>(14-2*i))&3) == 0) {
+			colour = 0x001F; // Red
+		} else if (((code>>(14-2*i))&3) == 1) {
+			colour = 0x03FF; // Yellow
+		} else if (((code>>(14-2*i))&3) == 2) {
+			colour = 0x03E0; // Green
+		} else {
+			colour = 0x7C00; // Blue
 		}
-	} else {
-		// Low 8 bits
-		for (i = 0; i < 4; i++) {						// Pair of bits to use
-			if (((code>>(6-2*i))&3) == 0) {
-				colour = 0x001F; // Red
-			} else if (((code>>(6-2*i))&3) == 1) {
-				colour = 0x03FF; // Yellow
-			} else if (((code>>(6-2*i))&3) == 2) {
-				colour = 0x03E0; // Green
-			} else {
-				colour = 0x7C00; // Blue
-			}
-			for (j = 87; j < 103; j++) { 				// Row
-				for (k = 32*i+72; k < 32*i+88; k++) {	// Column
-					VRAM_A[j*256+k] = colour;
-				}
+		for (j = 103; j < 119; j++) { 				// Row
+			for (k = 32*i+8; k < 32*i+24; k++) {	// Column
+				VRAM_A[j*256+k] = colour;
 			}
 		}
 	}
