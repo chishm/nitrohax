@@ -20,9 +20,11 @@ __irq_vector	=	__vram_top - 4;
 
 __arm9ram_start	=	ORIGIN(arm9ram);
 __arm9ram_top	=	ORIGIN(arm9ram)+ LENGTH(arm9ram);
-__arm9_sp_irq	=	__arm9ram_top - 0x60;
-__arm9_sp_svc	=	__arm9_sp_irq - 0x100;
-__arm9_sp_usr	=	__arm9_sp_svc - 0x100;
+
+/* No IRQs or SVC calls in ARM9 boot code so give them minimal stacks */
+__arm9_sp_irq	=	__arm9ram_top;
+__arm9_sp_svc	=	__arm9_sp_irq - 0x10;
+__arm9_sp_usr	=	__arm9_sp_svc - 0x10;
 
 
 SECTIONS
