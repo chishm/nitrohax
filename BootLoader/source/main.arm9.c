@@ -48,6 +48,7 @@ volatile u32 arm9_BLANK_RAM = 0;
 External functions
 --------------------------------------------------------------------------*/
 extern void arm9_clearCache (void);
+extern void arm9_reset (void);
 
 /*-------------------------------------------------------------------------
 arm9_errorOutput
@@ -136,7 +137,7 @@ static void arm9_errorOutput (u32 code) {
 arm9_main
 Clears the ARM9's icahce and dcache
 Clears the ARM9's DMA channels and resets video memory
-Jumps to the ARM9 NDS binary in sync with the display and ARM7
+Jumps to the ARM9 NDS binary in sync with the  ARM7
 Written by Darkain, modified by Chishm
 --------------------------------------------------------------------------*/
 void arm9_main (void) {
@@ -227,9 +228,6 @@ void arm9_main (void) {
 		}
 	}
 
-	// wait for vblank then boot
-	while(REG_VCOUNT!=191);
-	while(REG_VCOUNT==191);
-	resetCpu();
+	arm9_reset();
 }
 

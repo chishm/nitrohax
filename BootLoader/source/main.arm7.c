@@ -45,7 +45,11 @@
 #include "read_card.h"
 #include "cheat.h"
 
-void arm7_clearmem (void* loc, size_t len);
+/*-------------------------------------------------------------------------
+External functions
+--------------------------------------------------------------------------*/
+extern void arm7_clearmem (void* loc, size_t len);
+extern void arm7_reset (void);
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Important things
@@ -186,29 +190,6 @@ int arm7_loadBinary (void) {
 }
 
 
-/*-------------------------------------------------------------------------
-arm7_startBinary
-Jumps to the ARM7 NDS binary in sync with the display and ARM9
-Written by Darkain, modified by Chishm.
---------------------------------------------------------------------------*/
-void arm7_startBinary (void)
-{
-	// Wait until the ARM9 is ready
-	while (arm9_stateFlag != ARM9_READY);
-
-	while(REG_VCOUNT!=191);
-	while(REG_VCOUNT==191);
-
-	// Get the ARM9 to boot
-	arm9_stateFlag = ARM9_BOOTBIN;
-
-	while(REG_VCOUNT!=191);
-	while(REG_VCOUNT==191);
-	// Start ARM7
-	resetCpu();
-}
-
-
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Main function
 
@@ -243,9 +224,7 @@ void arm7_main (void) {
 		errorOutput(errorCode);
 	}
 
-	arm7_startBinary();
 	ipcSendState(ARM7_BOOTBIN);
 
-	return;
+	arm7_reset();
 }
-

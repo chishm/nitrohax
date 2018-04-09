@@ -70,11 +70,12 @@ Thanks to (in no particular order):
 * Pink-Lightning - Original skin (v0.5-0.82)
 * bLAStY - Memory dumps
 * cReDiAr - Last crucial step for running DS Cards
-* Parasyte - Tips for hooking the game automagically
+* Parasyte - Tips for hooking the game automatically
 * kenobi - Action Replay code document
 * Darkain - Memory and cache clearing code
 * Martin Korth - GBAtek
 * Deathwind / WinterMute - File menu code (v0.2 - v0.4)
+* WinterMute - dslink source, reset code
 * Everyone else who helped me along the way
 
 Big thanks to Datel (CodeJunkies) for creating the original Action Replay and
