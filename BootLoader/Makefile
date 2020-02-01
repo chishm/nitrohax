@@ -27,6 +27,7 @@ CFLAGS	:=	-g -Wall -O2\
 			-fomit-frame-pointer\
 			-ffast-math \
 			-Wall -Wextra -Werror \
+			-Wno-address-of-packed-member \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -DARM7
