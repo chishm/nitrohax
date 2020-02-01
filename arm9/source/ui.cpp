@@ -697,7 +697,7 @@ std::vector<UserInterface::FileInfo> UserInterface::getDirContents (const char* 
 		size_t nameLen = strlen(dentry->d_name);
 		if ( (isDirectory && strcmp(dentry->d_name, ".") != 0) ||
 		        extension == NULL ||
-		        strcasecmp(extension, &dentry->d_name[nameLen-extLen]) != 0 )
+		        strcasecmp(extension, &dentry->d_name[nameLen-extLen]) == 0 )
 		{
 		    UserInterface::FileInfo fileInfo;
 			fileInfo.filename = dentry->d_name;
