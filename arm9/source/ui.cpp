@@ -653,10 +653,15 @@ void UserInterface::cheatMenu (CheatFolder* gameCodes, CheatFolder* top)
 		setCursorPosition ((MENU_FIRST_ROW + menuLevel.selected - menuLevel.top) * TOUCH_GRID_SIZE);
 		setScrollbarPosition (CHEAT_MENU_TOP + menuLevel.selected, (int)contents.size()-1);
 		showMessage (TEXT_TITLE, "%s", gameCodes->getName());
-		if (contents[menuLevel.selected]->note.empty()) {
-			showMessage (TEXT_INFO, "%s", contents[menuLevel.selected]->getName());
+
+		if (menuLevel.selected != CHEAT_MENU_FOLDER_UP) {
+			if (contents[menuLevel.selected]->note.empty()) {
+				showMessage (TEXT_INFO, "%s", contents[menuLevel.selected]->getName());
+			} else {
+				showMessage (TEXT_INFO, "%s\n\n%s", contents[menuLevel.selected]->getName(), contents[menuLevel.selected]->getNote());
+			}
 		} else {
-			showMessage (TEXT_INFO, "%s\n\n%s", contents[menuLevel.selected]->getName(), contents[menuLevel.selected]->getNote());
+			showMessage (TEXT_INFO, "Parent Directory");
 		}
 	}
 
