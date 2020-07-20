@@ -18,6 +18,7 @@
 
 #include "read_card.h"
 
+#include <assert.h>
 #include <nds.h>
 #include <nds/arm9/cache.h>
 #include <nds/dma.h>
@@ -146,6 +147,9 @@ int cardInit (tNDSHeader* ndsHeader, u32* chipID)
 	cardParamCommand (CARD_CMD_DUMMY, 0,
 		CARD_ACTIVATE | CARD_nRESET | CARD_CLK_SLOW | CARD_BLK_SIZE(1) | CARD_DELAY1(0x1FFF) | CARD_DELAY2(0x3F),
 		NULL, 0);
+
+	// Verify that the ndsHeader is packed correctly, now that it's no longer __packed__
+	static_assert(sizeof(tNDSHeader) == 0x160, "tNDSHeader not packed properly");
 
 	// Read the header
 	cardParamCommand (CARD_CMD_HEADER_READ, 0,
