@@ -22,16 +22,17 @@
 #define TAB_STOP 4
 #define SCREEN_WIDTH 32
 
-ConsoleText::ConsoleText (int width, int height, CHAR_SIZE tileSize, u16* fontMap, u16 palette)
+
+ConsoleText::ConsoleText (int width, int height, CHAR_SIZE tileSize, vu16 *const fontMap, u16 palette):
+	fontPal(palette << 12),
+	row(0),
+	col(0),
+	width(width),
+	height(height),
+	fontStart(0),
+	fontMap(fontMap),
+	tileSize(tileSize)
 {
-	this->width = width;
-	this->height = height;
-	this->tileSize = tileSize;
-	this->fontStart = 0;
-	this->fontMap = fontMap;
-	this->fontPal = (u16)(palette << 12);
-	this->row = 0;
-	this->col = 0;
 }
 
 void ConsoleText::clearText (void)
