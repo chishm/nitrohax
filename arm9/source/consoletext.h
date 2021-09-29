@@ -23,7 +23,7 @@ class ConsoleText
 public:
 	enum CHAR_SIZE {CHAR_SIZE_8PX, CHAR_SIZE_16PX};
 
-	ConsoleText (int width, int height, CHAR_SIZE tileSize, u16* fontMap, u16 palette);
+	ConsoleText (int width, int height, CHAR_SIZE tileSize, vu16 *const fontMap, u16 palette);
 
 	void setPosition (int x, int y);
 	void clearText (void);
@@ -44,6 +44,6 @@ private:
 	int row, col;
 	int width, height;
 	int fontStart;
-	u16* fontMap;
+	vu16 *const fontMap;
 	CHAR_SIZE tileSize;
 } ;

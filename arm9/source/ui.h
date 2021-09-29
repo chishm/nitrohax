@@ -82,7 +82,8 @@ private:
 
  	static const int GO_BUTTON_PALETTE = 8;
  	static const int GO_BUTTON_OFFSET = 256;
- 	static const int BLANK_TILE = 0;
+
+	static const int BLANK_TILE = 0;
 
 	static const int NUM_CURSORS = 4;
 
@@ -94,7 +95,7 @@ private:
 	// GUI elements
 	Sprite* scrollbox;
 	Sprite* cursor[NUM_CURSORS];
-	u16* guiSubMap;
+	vu16* guiSubMap;
 	int scrollboxPosition;
 
 	// Menu elements
@@ -120,11 +121,12 @@ private:
 
 	int menuInput(bool enableGoButton);
 
- 	void putGuiTile (int val, int row, int col, int palette, bool doubleSize);
+	void putGuiTile (int val, int row, int col, int palette, bool doubleSize);
 	void clearFolderBackground(void);
- 	void showCursor (bool visible);
- 	void setCursorPosition (int offset);
- 	void putButtonBg (BUTTON_BG_OFFSETS buttonBg, int position);	void showScrollbar (bool visisble);
+	void showCursor (bool visible);
+	void setCursorPosition (int offset);
+	void putButtonBg (BUTTON_BG_OFFSETS buttonBg, int position);
+	void showScrollbar (bool visisble);
 	void setScrollbarPosition (int offset, int listLength);
 	void showGoButton (bool visible, int left, int top);
 } ;

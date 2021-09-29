@@ -101,10 +101,10 @@ const char CHEAT_MENU_FOLDER_UP_NAME[] = " [..]";
 
 UserInterface ui;
 
-void vramcpy (void* dest, const void* src, int size)
+static void vramcpy (volatile void* dest, const void* src, int size)
 {
-	u16* destination = (u16*)dest;
-	u16* source = (u16*)src;
+	vu16* destination = (vu16*)dest;
+	const u16* source = (u16*)src;
 	while (size > 0) {
 		*destination++ = *source++;
 		size-=2;
@@ -151,8 +151,9 @@ UserInterface::UserInterface (void)
 	vramcpy ((void*)(CHAR_BASE_BLOCK(4) + TEXTBOX_OFFSET * TILE_SIZE), textboxTiles, textboxTilesLen);
 	textboxMap = (u16*)SCREEN_BASE_BLOCK(2);
 	// Clear tile 0
+	vu16 *const tile_0 = (vu16*) BG_TILE_RAM(4);
 	for (int i = 0; i < TILE_SIZE/2; i++) {
-		((u16*)CHAR_BASE_BLOCK(4))[i] = 0;
+		tile_0[i] = 0;
 	}
 	clearBox();
 
@@ -168,8 +169,8 @@ UserInterface::UserInterface (void)
 	BG_OFFSET_SUB[2].x = -4;
 	BG_OFFSET_SUB[2].y = -4;
 
-	u16* fontMapTop = (u16*)SCREEN_BASE_BLOCK(4);
-	u16* fontMapSub = (u16*)SCREEN_BASE_BLOCK_SUB(4);
+	vu16 *const fontMapTop = (u16*)SCREEN_BASE_BLOCK(4);
+	vu16 *const fontMapSub = (u16*)SCREEN_BASE_BLOCK_SUB(4);
 
 	// Initialise consoles
 	topText = new ConsoleText (CONSOLE_SCREEN_WIDTH, CONSOLE_SCREEN_HEIGHT,
@@ -181,8 +182,8 @@ UserInterface::UserInterface (void)
 	}
 
 	// Set up the GUI BG
-	u16* tileDestSub = (u16*)CHAR_BASE_BLOCK_SUB(4);
-	guiSubMap = (u16*)SCREEN_BASE_BLOCK_SUB(2);
+	vu16 *const tileDestSub = (vu16*)CHAR_BASE_BLOCK_SUB(4);
+	guiSubMap = (vu16*)SCREEN_BASE_BLOCK_SUB(2);
 	BG_OFFSET[1].x = 0;
 	BG_OFFSET[1].y = 0;
 	// Create a double size blank tile
@@ -964,7 +965,8 @@ void UserInterface::demo (void)
 	setScrollbarPosition (menuLength - 1, menuLength - 1);
 	showMessage (TEXT_TITLE, "Mario Kart DS (USA)");
 
-	for (int curItem = 0; curItem < menuLength; curItem++) {		subText->putText (demoMenu[curItem].name, (MENU_FIRST_ROW + curItem) * 2,
+	for (int curItem = 0; curItem < menuLength; curItem++) {
+		subText->putText (demoMenu[curItem].name, (MENU_FIRST_ROW + curItem) * 2,
 			MENU_FIRST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_LAST_COL, (MENU_FIRST_ROW + curItem) * 2, MENU_FIRST_COL);
 
 		putButtonBg ((BUTTON_BG_OFFSETS)demoMenu[curItem].icon, (MENU_FIRST_ROW + curItem) * 2);

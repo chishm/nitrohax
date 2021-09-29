@@ -62,6 +62,7 @@ Written by Chishm
 static void arm9_errorOutput (u32 code) {
 	int i, j, k;
 	u16 colour;
+	vu16 *const vram_a = (vu16*)VRAM_A;
 
 	REG_POWERCNT = (u16)(POWER_LCD | POWER_2D_A);
 	REG_DISPCNT = MODE_FB0;
@@ -69,7 +70,7 @@ static void arm9_errorOutput (u32 code) {
 
 	// Clear display
 	for (i = 0; i < 256*192; i++) {
-		VRAM_A[i] = 0x0000;
+		vram_a[i] = 0x0000;
 	}
 
 	// Draw boxes of colour, signifying error codes
@@ -88,7 +89,7 @@ static void arm9_errorOutput (u32 code) {
 			}
 			for (j = 71; j < 87; j++) { 				// Row
 				for (k = 32*i+8; k < 32*i+24; k++) {	// Column
-					VRAM_A[j*256+k] = colour;
+					vram_a[j*256+k] = colour;
 				}
 			}
 		}
@@ -107,7 +108,7 @@ static void arm9_errorOutput (u32 code) {
 		}
 		for (j = 103; j < 119; j++) { 				// Row
 			for (k = 32*i+8; k < 32*i+24; k++) {	// Column
-				VRAM_A[j*256+k] = colour;
+				vram_a[j*256+k] = colour;
 			}
 		}
 	}
